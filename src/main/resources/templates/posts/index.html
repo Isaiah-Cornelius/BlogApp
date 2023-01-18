@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Posts Index</title>
+    <div th:insert="~{partials :: head}"></div>
+</head>
+<body>
+<nav th:replace="~{partials :: navbar}"></nav>
+
+<div th:each="post : ${posts}">
+    <h1><span th:text="${post.title}"> </span></h1>
+    <p><span th:text="${post.body}"> </span></p>
+    <br>
+</div>
+
+
+
+<footer th:replace="~{partials :: footer}"></footer>
+</body>
+</html>
