@@ -1,6 +1,7 @@
 package com.codeup.blogapp.controllers;
 
 import com.codeup.blogapp.models.Post;
+import com.codeup.blogapp.repositories.PostRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -11,31 +12,52 @@ import java.util.List;
 @Controller
 public class PostController {
 
+    private final PostRepository postDao;
+
+    public PostController(PostRepository postDao) {
+        this.postDao = postDao;
+    }
 
     @GetMapping("/posts")
-    public String postsGet(Model model) {
-        List<Post> postsList = new ArrayList();
-        postsList.add(new Post(1l, "Post 1 Title", "Post 1 Body"));
-        postsList.add(new Post(2l, "Post 2 Title", "Post 2 Body"));
-        model.addAttribute("posts", postsList);
+    public String index(Model model) {
+        model.addAttribute("posts", postDao.findAll());
         return "posts/index";
     }
 
     @RequestMapping(path = "/posts/{id}", method = RequestMethod.GET)
     public String postsGetId(@PathVariable long id, Model model) {
-        String stringId = Long.toString(id);
-        String postTitle = "Test title " + stringId;
-        String postBody = "Test body " + stringId;
-        Post post = new Post(id, postTitle, postBody);
+        Post post = postDao.getReferenceById(id);
+//        model.addAttribute("title", post.getTitle());
+//        model.addAttribute("body", post.getBody());
+//        model.addAttribute("id", post.getId());
+        model.addAttribute("post", post);
+
+//        model.addAttribute("post", post);
+        return "posts/show";
+    }
+
+    @RequestMapping(path = "/posts/fwd", method = RequestMethod.POST)
+    public String postFwd(@RequestParam(name = "id") Long id, Model model){
+        Post post = postDao.getReferenceById(id);
         model.addAttribute("post", post);
         return "posts/show";
     }
 
+    @RequestMapping(path = "/posts/delete", method = RequestMethod.POST)
+    public String postDelete(@RequestParam(name = "id") Long id, Model model){
+        postDao.deleteById(id);
+        return "redirect:/posts";
+    }
+
     @GetMapping("/posts/create")
-    @ResponseBody
-    public String postsGetCreate() { return "view the form for creating a post."; }
+    public String postsGetCreate() {
+        return "/posts/create";
+    }
 
     @PostMapping ("/posts/create")
-    @ResponseBody
-    public String postsPostCreate() { return "create a new post."; }
+    public String method(@RequestParam(name = "title") String title, @RequestParam(name = "body") String body) {
+        Post post = new Post(title, body);
+        postDao.save(post);
+        return "redirect:/posts";
+    }
 }

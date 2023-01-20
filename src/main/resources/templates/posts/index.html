@@ -6,10 +6,20 @@
 </head>
 <body>
 <nav th:replace="~{partials :: navbar}"></nav>
+<a href="/posts/create">Create Post</a>
 
 <div th:each="post : ${posts}">
     <h1><span th:text="${post.title}"> </span></h1>
     <p><span th:text="${post.body}"> </span></p>
+    <p><span th:text="${post.id}"></span></p>
+    <form action="/posts/fwd" method="post">
+        <input type="hidden" name="id" th:value="${post.id}">
+        <button type="submit">View Post</button>
+    </form>
+    <form action="/posts/delete" method="post">
+        <input type="hidden" name="id" th:value="${post.id}">
+        <button type="submit">Delete Post</button>
+    </form>
     <br>
 </div>
 
