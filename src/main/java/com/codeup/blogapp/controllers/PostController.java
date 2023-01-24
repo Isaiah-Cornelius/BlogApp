@@ -4,6 +4,7 @@ import com.codeup.blogapp.models.Post;
 import com.codeup.blogapp.models.User;
 import com.codeup.blogapp.repositories.PostRepository;
 import com.codeup.blogapp.repositories.UserRepository;
+import com.codeup.blogapp.service.EmailService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -15,14 +16,13 @@ public class PostController {
 
     private final UserRepository userDao;
 
-    public PostController(PostRepository postDao, UserRepository userDao) {
+    private final EmailService emailService;
+
+    public PostController(PostRepository postDao, UserRepository userDao, EmailService emailService) {
         this.postDao = postDao;
         this.userDao = userDao;
+        this.emailService = emailService;
     }
-
-
-
-
 
     @GetMapping("/posts")
     public String index(Model model) {
@@ -32,18 +32,6 @@ public class PostController {
 
     @RequestMapping(path = "/posts/{id}", method = RequestMethod.GET)
     public String postsGetId(@PathVariable long id, Model model) {
-        Post post = postDao.getReferenceById(id);
-//        model.addAttribute("title", post.getTitle());
-//        model.addAttribute("body", post.getBody());
-//        model.addAttribute("id", post.getId());
-        model.addAttribute("post", post);
-
-//        model.addAttribute("post", post);
-        return "posts/show";
-    }
-
-    @RequestMapping(path = "/posts/fwd", method = RequestMethod.POST)
-    public String postFwd(@RequestParam(name = "id") Long id, Model model){
         Post post = postDao.getReferenceById(id);
         model.addAttribute("post", post);
         return "posts/show";
@@ -56,14 +44,31 @@ public class PostController {
     }
 
     @GetMapping("/posts/create")
-    public String postsGetCreate() {
+    public String postsGetCreate(Model model) {
+        model.addAttribute("post", new Post());
         return "/posts/create";
     }
 
     @PostMapping ("/posts/create")
-    public String method(@RequestParam(name = "title") String title, @RequestParam(name = "body") String body) {
+    public String createPost(@ModelAttribute Post post) {
         User postUser = userDao.getReferenceById(1l);
-        Post post = new Post(title, body, postUser);
+        post.setUser(postUser);
+        postDao.save(post);
+        emailService.prepareAndSend(post, post.getTitle(), post.getBody());
+        return "redirect:/posts";
+    }
+
+    @GetMapping("/posts/edit")
+    public String postsGetEdit(@RequestParam(name = "id") Long id, Model model) {
+        Post post = postDao.getReferenceById(id);
+        model.addAttribute("post", post);
+        return "/posts/edit";
+    }
+
+    @PostMapping ("/posts/edit")
+    public String editPost(@ModelAttribute Post post) {
+        User postUser = userDao.getReferenceById(1l);
+        post.setUser(postUser);
         postDao.save(post);
         return "redirect:/posts";
     }

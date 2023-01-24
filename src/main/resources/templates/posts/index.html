@@ -11,9 +11,12 @@
 <div th:each="post : ${posts}">
     <h1><span th:text="${post.title}"> </span></h1>
     <p><span th:text="${post.body}"> </span></p>
-    <form action="/posts/fwd" method="post">
-        <input type="hidden" name="id" th:value="${post.id}">
+    <form th:action="@{/posts/{id}(id=${post.id})}">
         <button type="submit">View Post</button>
+    </form>
+    <form th:action="@{/posts/edit}" th:method="get">
+        <input type="hidden" name="id" th:value="${post.id}">
+        <button type="submit">Edit Post</button>
     </form>
     <form action="/posts/delete" method="post">
         <input type="hidden" name="id" th:value="${post.id}">
