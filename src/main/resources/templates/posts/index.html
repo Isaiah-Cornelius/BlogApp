@@ -1,29 +1,29 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<!-- ... -->
+<div sec:authorize="isAuthenticated()">
+    This content is only shown to authenticated users.
+
+    User ID: <span th:text="${#authentication.principal.id}"/>
+    Username: <span th:text="${#authentication.principal.username}"/>
+    Email: <span th:text="${#authentication.principal.email}"/>
+</div>
 <head>
     <title>Posts Index</title>
     <div th:insert="~{partials :: head}"></div>
 </head>
 <body>
-<nav th:replace="~{partials :: navbar}"></nav>
-<a href="/posts/create">Create Post</a>
+    <nav th:replace="~{partials :: navbar}"></nav>
+    <a href="/posts/create">Create Post</a>
 
-<div th:each="post : ${posts}">
-    <h1><span th:text="${post.title}"> </span></h1>
-    <p><span th:text="${post.body}"> </span></p>
-    <form th:action="@{/posts/{id}(id=${post.id})}">
-        <button type="submit">View Post</button>
-    </form>
-    <form th:action="@{/posts/edit}" th:method="get">
-        <input type="hidden" name="id" th:value="${post.id}">
-        <button type="submit">Edit Post</button>
-    </form>
-    <form action="/posts/delete" method="post">
-        <input type="hidden" name="id" th:value="${post.id}">
-        <button type="submit">Delete Post</button>
-    </form>
-    <br>
-</div>
+    <div th:each="post : ${posts}">
+        <h1><span th:text="${post.title}"> </span></h1>
+        <p><span th:text="${post.body}"> </span></p>
+        <form th:action="@{/posts/{id}(id=${post.id})}">
+            <button type="submit">View Post</button>
+        </form>
+    </div>
 
 
 

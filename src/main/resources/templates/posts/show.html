@@ -11,6 +11,16 @@
 <p>Post body: <span th:text="${post.body}"></span></p>
 <p>Post ID: <span th:text="${post.id}"></span></p>
 <p>Post ID: <span th:text="${post.user.email}"></span></p>
+<div th:if="${post.user.id} == ${#authentication.principal.id}">
+    <form th:action="@{/posts/edit}" th:method="get">
+        <input type="hidden" name="id" th:value="${post.id}">
+        <button type="submit">Edit Post</button>
+    </form>
+    <form th:action="@{/posts/delete}" th:method="post">
+        <input type="hidden" name="id" th:value="${post.id}">
+        <button type="submit">Delete Post</button>
+    </form>
+</div>
 
 
 <footer th:replace="~{partials :: footer}"></footer>
